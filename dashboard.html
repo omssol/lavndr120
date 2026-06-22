@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>LAVNDR120</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --void:       #04040A;
+  --glass:      rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --gold:       #C9A84C;
+  --gold-dim:   rgba(201,168,76,0.15);
+  --gold-glow:  rgba(201,168,76,0.3);
+  --emerald:    rgba(16,185,129,0.15);
+  --emerald-solid: #10B981;
+  --sapphire:   rgba(59,130,246,0.15);
+  --sapphire-solid: #3B82F6;
+  --amethyst:   rgba(139,92,246,0.15);
+  --amethyst-solid: #8B5CF6;
+  --red:        #F43F5E;
+  --text:       rgba(255,255,255,0.9);
+  --text-dim:   rgba(255,255,255,0.4);
+  --text-faint: rgba(255,255,255,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Ambient background ── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(201,168,76,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(139,92,246,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 60% 30%, rgba(59,130,246,0.04) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+.wrap { position:relative; z-index:1; max-width:480px; margin:0 auto; padding:0 16px 100px; }
+
+/* ── Glass card ── */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 56px 0 32px;
+  text-align: center;
+}
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+.hero-ticker {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #C9A84C 0%, #F0D080 50%, #C9A84C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.hero-subtitle {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+/* ── NAV Card ── */
+.nav-card {
+  padding: 24px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.nav-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+.nav-label { font-size:11px; color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+.nav-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.nav-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 100px;
+}
+.nav-change.pos { background:rgba(16,185,129,0.15); color:var(--emerald-solid); }
+.nav-change.neg { background:rgba(244,63,94,0.15); color:var(--red); }
+
+.nav-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 16px;
+}
+.nav-meta-item { text-align:center; }
+.nav-meta-item:not(:last-child) { border-left: 1px solid var(--glass-border); }
+.nav-meta-label { font-size:10px; color:var(--text-faint); margin-bottom:4px; }
+.nav-meta-val { font-size:14px; font-weight:500; }
+
+/* ── Section title ── */
+.section-title {
+  font-size:11px;
+  letter-spacing:3px;
+  color:var(--text-faint);
+  text-transform:uppercase;
+  margin: 24px 0 12px;
+  padding-right: 4px;
+}
+
+/* ── Position Card (My Rank) ── */
+.position-card {
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.rank-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--gold-dim);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+.rank-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--gold);
+  line-height: 1;
+}
+.rank-of { font-size:9px; color:var(--text-dim); }
+.position-info { flex:1; }
+.position-name { font-size:15px; font-weight:500; margin-bottom:4px; }
+.position-stats { display:flex; gap:16px; margin-top:8px; }
+.position-stat-label { font-size:10px; color:var(--text-dim); margin-bottom:2px; }
+.position-stat-val { font-size:14px; font-weight:600; }
+
+/* ── Weight Bar ── */
+.weight-bar-wrap { margin-top:12px; }
+.weight-bar-top { display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-bottom:6px; }
+.weight-bar-bg { height:4px; background:var(--glass-border); border-radius:100px; overflow:hidden; }
+.weight-bar-fill { height:100%; border-radius:100px; background:linear-gradient(90deg, var(--gold), #F0D080); transition:width 1s ease; }
+
+/* ── Fund Card ── */
+.fund-card {
+  padding: 24px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(59,130,246,0.08) 100%);
+  border-color: rgba(16,185,129,0.2);
+}
+.fund-row { display:flex; justify-content:space-between; align-items:center; }
+.fund-entry { font-size:12px; color:var(--text-dim); }
+.fund-current-label { font-size:11px; color:var(--emerald-solid); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+.fund-current-val {
+  font-family:'Playfair Display',serif;
+  font-size:36px;
+  color: var(--emerald-solid);
+  line-height:1;
+}
+.fund-pnl {
+  margin-top:16px;
+  padding:12px 16px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.fund-pnl.pos { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); }
+.fund-pnl.neg { background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.2); }
+.fund-pnl-label { font-size:11px; color:var(--text-dim); }
+.fund-pnl-val { font-size:20px; font-weight:600; }
+.fund-pnl-pct { font-size:12px; opacity:0.7; margin-top:2px; }
+.fund-actions { display:flex; gap:10px; margin-top:16px; }
+
+/* ── Buttons ── */
+.btn {
+  flex:1; padding:13px; border-radius:12px;
+  font-size:14px; font-weight:500; cursor:pointer;
+  border:none; transition:all 0.2s;
+  font-family:'Inter',sans-serif;
+}
+.btn-primary {
+  background:linear-gradient(135deg, var(--gold), #A07828);
+  color:#000;
+}
+.btn-primary:active { transform:scale(0.97); }
+.btn-ghost {
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  color:var(--text);
+}
+.btn-ghost:active { transform:scale(0.97); }
+.btn-danger {
+  background:rgba(244,63,94,0.15);
+  border:1px solid rgba(244,63,94,0.3);
+  color:var(--red);
+}
+
+/* ── Chart Card ── */
+.chart-card { padding:20px; margin-bottom:16px; }
+.chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.chart-title { font-size:13px; font-weight:500; }
+.chart-period { display:flex; gap:4px; }
+.period-btn { padding:4px 10px; border-radius:6px; font-size:11px; border:none; cursor:pointer; background:transparent; color:var(--text-dim); font-family:'Inter',sans-serif; }
+.period-btn.active { background:var(--gold-dim); color:var(--gold); }
+.chart-wrap { height:160px; }
+
+/* ── Market Card ── */
+.market-card { padding:20px; margin-bottom:16px; border-color:rgba(139,92,246,0.2); background:rgba(139,92,246,0.05); }
+.market-empty { text-align:center; padding:20px; color:var(--text-faint); font-size:13px; }
+.market-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid var(--glass-border);
+}
+.market-item:last-of-type { border-bottom:none; }
+.market-seller { font-size:12px; color:var(--text-dim); }
+.market-price { font-size:15px; font-weight:600; color:var(--amethyst-solid); }
+
+/* ── Components Table ── */
+.components-card { padding:0; overflow:hidden; margin-bottom:16px; }
+.components-search {
+  padding:12px 16px;
+  border-bottom:1px solid var(--glass-border);
+}
+.components-search input {
+  width:100%; background:transparent; border:none; outline:none;
+  color:var(--text); font-size:13px; font-family:'Inter',sans-serif;
+}
+.components-search input::placeholder { color:var(--text-faint); }
+.comp-row {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  transition:background 0.15s;
+}
+.comp-row:active { background:var(--glass); }
+.comp-rank { font-size:11px; color:var(--text-faint); width:24px; text-align:center; flex-shrink:0; }
+.comp-ticker {
+  font-size:12px; font-weight:600;
+  width:44px; flex-shrink:0;
+  padding:3px 6px; border-radius:6px;
+  text-align:center;
+}
+.comp-ticker.top { background:var(--gold-dim); color:var(--gold); }
+.comp-ticker.mid { background:var(--sapphire); color:var(--sapphire-solid); }
+.comp-ticker.low { background:var(--glass); color:var(--text-dim); }
+.comp-name { flex:1; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.comp-right { text-align:left; flex-shrink:0; }
+.comp-weight { font-size:13px; font-weight:600; }
+.comp-alloc { font-size:10px; color:var(--text-faint); margin-top:1px; }
+.comp-bar { height:2px; background:var(--glass-border); border-radius:100px; margin-top:4px; overflow:hidden; }
+.comp-bar-fill { height:100%; border-radius:100px; }
+
+/* ── Bottom Nav ── */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  background:rgba(4,4,10,0.9);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--glass-border);
+  display:flex;
+  padding:8px 0 max(8px, env(safe-area-inset-bottom));
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  gap:4px; padding:8px; cursor:pointer;
+  color:var(--text-faint); font-size:10px;
+  border:none; background:transparent; font-family:'Inter',sans-serif;
+  transition:color 0.2s;
+}
+.nav-item.active { color:var(--gold); }
+.nav-icon { font-size:20px; line-height:1; }
+.nav-dot {
+  width:4px; height:4px; border-radius:50%;
+  background:var(--gold); margin:0 auto;
+  opacity:0; transition:opacity 0.2s;
+}
+.nav-item.active .nav-dot { opacity:1; }
+
+/* ── Notification bar ── */
+.notif-bar {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  background:linear-gradient(135deg, var(--gold), #A07828);
+  color:#000; font-size:13px; font-weight:500;
+  padding:12px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+  transform:translateY(-100%); transition:transform 0.3s ease;
+}
+.notif-bar.show { transform:translateY(0); }
+
+/* ── Loading ── */
+.loading-wrap {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; min-height:100vh; gap:20px;
+}
+.loader-ring {
+  width:48px; height:48px; border-radius:50%;
+  border:2px solid var(--glass-border);
+  border-top-color:var(--gold);
+  animation:spin 1s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loader-text { font-size:13px; color:var(--text-dim); }
+
+/* ── Screens ── */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* ── Pulse animation ── */
+@keyframes pulse-gold {
+  0%,100% { box-shadow:0 0 20px var(--gold-glow); }
+  50% { box-shadow:0 0 40px var(--gold-glow), 0 0 60px rgba(201,168,76,0.1); }
+}
+.pulse { animation:pulse-gold 3s ease-in-out infinite; }
+
+/* ── Fade in ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.fade-up { animation:fadeUp 0.5s ease forwards; }
+.fade-up-2 { animation:fadeUp 0.5s 0.1s ease both; }
+.fade-up-3 { animation:fadeUp 0.5s 0.2s ease both; }
+.fade-up-4 { animation:fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<!-- Notification Bar -->
+<div class="notif-bar" id="notifBar">
+  <span id="notifText"></span>
+  <span onclick="closeNotif()" style="cursor:pointer;opacity:0.7;">✕</span>
+</div>
+
+<!-- Loading -->
+<div class="loading-wrap" id="loadingWrap">
+  <div class="loader-ring"></div>
+  <div class="loader-text">جاري تحميل LAVNDR120...</div>
+</div>
+
+<!-- Main Content -->
+<div class="wrap" id="mainWrap" style="display:none;">
+
+  <!-- ── SCREEN: HOME ── -->
+  <div class="screen active" id="screenHome">
+
+    <!-- Hero -->
+    <div class="hero fade-up">
+      <div class="hero-eyebrow">مؤشر السودان الاستهلاكي</div>
+      <div class="hero-ticker">LAVNDR120</div>
+      <div class="hero-subtitle" id="lastUpdateText">يتم التحديث...</div>
+    </div>
+
+    <!-- NAV Card -->
+    <div class="glass nav-card fade-up-2">
+      <div class="nav-label">صافي قيمة الأصول</div>
+      <div class="nav-value" id="navValue" style="color:var(--gold);">—</div>
+      <div id="navChange" class="nav-change pos">— —</div>
+      <div class="nav-meta">
+        <div class="nav-meta-item">
+          <div class="nav-meta-label">High</div>
+          <div class="nav-meta-val" id="dayHigh">—</div>
+        </div>
+        <div class="nav-meta-item">
+          <div class="nav-meta-label">Low</div>
+          <div class="nav-meta-val" id="dayLow">—</div>
+        </div>
+        <div class="nav-meta-item">
+          <div class="nav-meta-label">Volatility</div>
+          <div class="nav-meta-val" id="volatility">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Position -->
+    <div class="section-title">موقعك في المؤشر</div>
+    <div class="glass position-card fade-up-3 pulse" id="positionCard">
+      <div class="rank-circle">
+        <div class="rank-num" id="myRank">—</div>
+        <div class="rank-of">من 120</div>
+      </div>
+      <div class="position-info">
+        <div class="position-name" id="myBusinessName">بزنسك</div>
+        <div class="position-stats">
+          <div>
+            <div class="position-stat-label">الطلبات</div>
+            <div class="position-stat-val" id="myOrders">—</div>
+          </div>
+          <div>
+            <div class="position-stat-label">الرمز</div>
+            <div class="position-stat-val" id="myTicker" style="color:var(--gold);">—</div>
+          </div>
+        </div>
+        <div class="weight-bar-wrap">
+          <div class="weight-bar-top">
+            <span>الوزن في المؤشر</span>
+            <span id="myWeight" style="color:var(--gold);">—</span>
+          </div>
+          <div class="weight-bar-bg">
+            <div class="weight-bar-fill" id="myWeightBar" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fund Value -->
+    <div class="section-title">قيمة حصتك في الصندوق</div>
+    <div class="glass fund-card fade-up-4" id="fundCard">
+      <div class="fund-row">
+        <div>
+          <div class="fund-current-label">القيمة الحالية</div>
+          <div class="fund-current-val" id="fundCurrentVal">—</div>
+        </div>
+        <div style="text-align:left;">
+          <div class="fund-entry">دفعت</div>
+          <div style="font-size:18px;font-weight:600;" id="fundEntryVal">—</div>
+        </div>
+      </div>
+      <div class="fund-pnl pos" id="fundPnl">
+        <div>
+          <div class="fund-pnl-label">الربح / الخسارة</div>
+          <div class="fund-pnl-pct" id="fundPnlPct">—</div>
+        </div>
+        <div class="fund-pnl-val" id="fundPnlVal">—</div>
+      </div>
+      <div class="fund-actions" id="fundActions">
+        <button class="btn btn-primary" onclick="showBuyModal()">اشتري حصة</button>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="section-title">أداء المؤشر</div>
+    <div class="glass chart-card fade-up">
+      <div class="chart-header">
+        <div class="chart-title">NAV — آخر 30 تحديث</div>
+        <div class="chart-period">
+          <button class="period-btn active">ساعي</button>
+          <button class="period-btn" onclick="loadMonth()">شهري</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="mainChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Index Stats -->
+    <div class="section-title">المؤشر</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div class="glass" style="padding:16px;">
+        <div class="nav-meta-label">الطلبات الكلية</div>
+        <div style="font-size:20px;font-weight:600;margin-top:4px;" id="totalOrders">—</div>
+      </div>
+      <div class="glass" style="padding:16px;">
+        <div class="nav-meta-label">الوحدات</div>
+        <div style="font-size:20px;font-weight:600;margin-top:4px;" id="totalUnits">—</div>
+      </div>
+      <div class="glass" style="padding:16px;">
+        <div class="nav-meta-label">Premium / Discount</div>
+        <div style="font-size:20px;font-weight:600;margin-top:4px;" id="premium">—</div>
+      </div>
+      <div class="glass" style="padding:16px;">
+        <div class="nav-meta-label">IIV</div>
+        <div style="font-size:20px;font-weight:600;margin-top:4px;" id="iivVal">—</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── SCREEN: MARKET ── -->
+  <div class="screen" id="screenMarket">
+    <div style="padding:40px 0 20px; text-align:center;">
+      <div class="hero-eyebrow">السوق الداخلي</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);">الحصص المتاحة</div>
+    </div>
+
+    <div class="glass market-card" id="marketList">
+      <div class="market-empty">لا توجد حصص معروضة حالياً</div>
+    </div>
+
+    <div class="section-title">الصندوق</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div class="glass" style="padding:16px;">
+        <div class="nav-meta-label">المشاركون النشطون</div>
+        <div style="font-size:24px;font-weight:600;color:var(--gold);margin-top:4px;" id="activeParticipants">—</div>
+      </div>
+      <div class="glass" style="padding:16px;">
+        <div class="nav-meta-label">إجمالي الصندوق</div>
+        <div style="font-size:20px;font-weight:600;margin-top:4px;" id="poolValue">—</div>
+      </div>
+    </div>
+
+    <div class="section-title">Settlement</div>
+    <div class="glass" style="padding:16px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div class="nav-meta-label">دورة التسوية</div>
+          <div style="font-size:16px;font-weight:600;margin-top:4px;" id="settlementCycle">T+2</div>
+        </div>
+        <div style="text-align:left;">
+          <div class="nav-meta-label">تاريخ التسوية</div>
+          <div style="font-size:16px;font-weight:600;margin-top:4px;" id="settlementDate">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN: COMPONENTS ── -->
+  <div class="screen" id="screenComponents">
+    <div style="padding:40px 0 20px; text-align:center;">
+      <div class="hero-eyebrow">مكونات المؤشر</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);">الأوزان اللحظية</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:8px;" id="compCount">—</div>
+    </div>
+
+    <div class="glass components-card" id="componentsList">
+      <div class="components-search">
+        <input type="text" id="searchInput" placeholder="ابحث عن منتج أو رمز..." oninput="filterComponents()">
+      </div>
+      <div id="componentsBody"></div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN: HISTORY ── -->
+  <div class="screen" id="screenHistory">
+    <div style="padding:40px 0 20px; text-align:center;">
+      <div class="hero-eyebrow">الأرشيف الشهري</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);">لقطات يوم 21</div>
+    </div>
+    <div id="snapshotsList"></div>
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchScreen('Home',this)">
+    <div class="nav-icon">◎</div>
+    <div>الرئيسية</div>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-item" onclick="switchScreen('Market',this)">
+    <div class="nav-icon">⇅</div>
+    <div>السوق</div>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-item" onclick="switchScreen('Components',this)">
+    <div class="nav-icon">▦</div>
+    <div>المكونات</div>
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-item" onclick="switchScreen('History',this)">
+    <div class="nav-icon">◷</div>
+    <div>الأرشيف</div>
+    <div class="nav-dot"></div>
+  </button>
+</nav>
+
+<script>
+// ── Config ──
+const BASE_URL = window.location.href.split('?')[0];
+const API_KEY  = new URLSearchParams(window.location.search).get('key') || 'LAVNDR_SECRET_KEY_2026';
+const USER_EMAIL = new URLSearchParams(window.location.search).get('email') || '';
+const API_DATA = BASE_URL + '?key=' + API_KEY + '&action=data';
+
+let globalData = null;
+let mainChart  = null;
+let allWeights = [];
+
+// ── Load Data ──
+async function loadData() {
+  try {
+    const res  = await fetch(API_DATA);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    globalData = data;
+    renderAll(data);
+    document.getElementById('loadingWrap').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loadingWrap').innerHTML =
+      '<div style="text-align:center;color:#F43F5E;padding:40px;">فشل الاتصال<br><small style="color:var(--text-dim);">' + e.message + '</small></div>';
+  }
+}
+
+// ── Render All ──
+function renderAll(data) {
+  renderNAV(data);
+  renderPosition(data);
+  renderFund(data);
+  renderChart(data);
+  renderStats(data);
+  renderMarket(data);
+  renderComponents(data);
+  renderHistory(data);
+}
+
+function renderNAV(data) {
+  const change = parseFloat(data.index.change);
+  const isPos  = change >= 0;
+  document.getElementById('navValue').textContent = '$' + data.index.NAV;
+  document.getElementById('navValue').style.color = isPos ? 'var(--emerald-solid)' : 'var(--red)';
+
+  const changeEl = document.getElementById('navChange');
+  changeEl.textContent = (isPos?'▲ +':'▼ ') + data.index.change + ' (' + data.index.changePercent + '%)';
+  changeEl.className   = 'nav-change ' + (isPos?'pos':'neg');
+
+  document.getElementById('dayHigh').textContent    = '$' + data.index.dayHigh;
+  document.getElementById('dayLow').textContent     = '$' + data.index.dayLow;
+  document.getElementById('volatility').textContent = data.index.volatility + '%';
+  document.getElementById('lastUpdateText').textContent = 'آخر تحديث ' + data.timestamp.split('T')[1].substring(0,5);
+}
+
+function renderPosition(data) {
+  if (!USER_EMAIL || !data.weights.length) return;
+
+  // إيجاد البزنس بالإيميل أو عرض أعلى مكوّن للتجربة
+  let myItem = null;
+  let myRank = '—';
+
+  // لو عندنا إيميل نبحث في الـ weights
+  // في الكود الحقيقي سيُحدد البزنس من الإيميل
+  // هنا نعرض أعلى عنصر كمثال
+  if (data.weights.length > 0) {
+    myItem = data.weights[0];
+    myRank = 1;
+  }
+
+  if (!myItem) return;
+
+  const weightPct = parseFloat(myItem.weight) || 0;
+  document.getElementById('myRank').textContent        = myRank;
+  document.getElementById('myBusinessName').textContent = myItem.name;
+  document.getElementById('myOrders').textContent      = myItem.count;
+  document.getElementById('myTicker').textContent      = myItem.ticker;
+  document.getElementById('myWeight').textContent      = weightPct.toFixed(2) + '%';
+  document.getElementById('myWeightBar').style.width   = Math.min(weightPct * 5, 100) + '%';
+}
+
+function renderFund(data) {
+  if (!data.fund) return;
+  document.getElementById('activeParticipants').textContent = data.fund.activeParticipants + ' / 120';
+  document.getElementById('poolValue').textContent = '$' + data.fund.poolValue;
+  document.getElementById('settlementCycle').textContent = data.settlementCycle;
+  document.getElementById('settlementDate').textContent = data.settlementDate;
+
+  // بيانات حصة المستخدم
+  if (USER_EMAIL) {
+    loadParticipantData();
+  }
+}
+
+async function loadParticipantData() {
+  try {
+    const res = await fetch(BASE_URL + '?key=' + API_KEY + '&action=participant&email=' + encodeURIComponent(USER_EMAIL));
+    const p   = await res.json();
+    if (p.error || !p.currentValue) {
+      // لم يشترك بعد
+      document.getElementById('fundCurrentVal').textContent = '—';
+      document.getElementById('fundEntryVal').textContent   = '—';
+      document.getElementById('fundPnlVal').textContent     = '—';
+      document.getElementById('fundActions').innerHTML =
+        '<button class="btn btn-primary" onclick="buyShare()">اشتري حصة — $513</button>';
+      return;
+    }
+    const pnl    = parseFloat(p.pnl);
+    const isPos  = pnl >= 0;
+    document.getElementById('fundCurrentVal').textContent  = '$' + p.currentValue;
+    document.getElementById('fundEntryVal').textContent    = '$' + p.sharePrice;
+    document.getElementById('fundPnlVal').textContent      = (isPos?'+':'') + '$' + p.pnl;
+    document.getElementById('fundPnlPct').textContent      = (isPos?'+':'') + p.pnlPercent + '%';
+    document.getElementById('fundPnl').className           = 'fund-pnl ' + (isPos?'pos':'neg');
+    document.getElementById('fundCurrentVal').style.color  = isPos ? 'var(--emerald-solid)' : 'var(--red)';
+
+    document.getElementById('fundActions').innerHTML = p.status === 'active'
+      ? '<button class="btn btn-danger" onclick="sellShare()">عرض للبيع</button>'
+      : '<div style="text-align:center;color:var(--amethyst-solid);font-size:13px;padding:10px;">حصتك معروضة في السوق</div>';
+  } catch(e) {}
+}
+
+function renderChart(data) {
+  const labels = data.history.map(h => h.time);
+  const values = data.history.map(h => h.NAV);
+  const isPos  = parseFloat(data.index.change) >= 0;
+  const color  = isPos ? '#10B981' : '#F43F5E';
+
+  if (mainChart) { mainChart.destroy(); mainChart = null; }
+
+  mainChart = new Chart(document.getElementById('mainChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: color,
+        backgroundColor: color + '15',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        borderWidth: 1.5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: {
+          display: true,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } }
+        }
+      }
+    }
+  });
+}
+
+function renderStats(data) {
+  document.getElementById('totalOrders').textContent = data.index.netOrders.toLocaleString();
+  document.getElementById('totalUnits').textContent  = data.index.netUnits;
+  document.getElementById('premium').textContent     = data.index.premium + '%';
+  document.getElementById('iivVal').textContent      = '$' + data.index.IIV;
+}
+
+function renderMarket(data) {
+  if (!data.fund) return;
+  const list = data.fund.market || [];
+  const el   = document.getElementById('marketList');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="market-empty">لا توجد حصص معروضة حالياً</div>';
+    return;
+  }
+  el.innerHTML = list.map(m => `
+    <div class="market-item">
+      <div>
+        <div class="market-seller">${m.seller}</div>
+        <div style="font-size:10px;color:var(--text-faint);margin-top:2px;">T+2</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="market-price">$${m.shareValue}</div>
+        ${USER_EMAIL && USER_EMAIL !== m.seller
+          ? `<button class="btn btn-ghost" style="padding:8px 14px;font-size:12px;" onclick="buyShare()">شراء</button>`
+          : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderComponents(data) {
+  allWeights = data.weights || [];
+  renderWeightsTable(allWeights, data.fund ? data.fund.sharePrice : 513);
+  document.getElementById('compCount').textContent =
+    data.weights.length + ' مكون من أصل ' + data.totalComponents;
+}
+
+function renderWeightsTable(weights, sharePrice) {
+  const body = document.getElementById('componentsBody');
+  body.innerHTML = weights.map((item, i) => {
+    const w      = parseFloat(item.weight) || 0;
+    const alloc  = (w / 100 * sharePrice).toFixed(2);
+    const cls    = w > 10 ? 'top' : w > 5 ? 'mid' : 'low';
+    const barClr = w > 10 ? 'var(--gold)' : w > 5 ? 'var(--sapphire-solid)' : 'var(--amethyst-solid)';
+    const barW   = Math.min(w * 5, 100);
+    return `
+      <div class="comp-row">
+        <div class="comp-rank">${i + 1}</div>
+        <div class="comp-ticker ${cls}">${item.ticker}</div>
+        <div class="comp-name">${item.name}</div>
+        <div class="comp-right">
+          <div class="comp-weight" style="color:${barClr}">${w.toFixed?w.toFixed(1):w}%</div>
+          <div class="comp-alloc">$${alloc}</div>
+          <div class="comp-bar"><div class="comp-bar-fill" style="width:${barW}%;background:${barClr};"></div></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterComponents() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allWeights.filter(w =>
+    w.name.toLowerCase().includes(q) || w.ticker.toLowerCase().includes(q)
+  );
+  renderWeightsTable(filtered, globalData?.fund?.sharePrice || 513);
+}
+
+function renderHistory(data) {
+  const snaps = data.monthlySnapshots || [];
+  const el    = document.getElementById('snapshotsList');
+  if (snaps.length === 0) {
+    el.innerHTML = '<div class="glass" style="padding:40px;text-align:center;color:var(--text-faint);">لا توجد لقطات شهرية بعد</div>';
+    return;
+  }
+  el.innerHTML = snaps.map(s => {
+    const prem   = parseFloat(s.premium);
+    const premCl = prem >= 0 ? 'var(--emerald-solid)' : 'var(--red)';
+    return `
+      <div class="glass" style="padding:20px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;">${s.month}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);margin-top:2px;">$${s.NAV}</div>
+          </div>
+          <div style="text-align:left;">
+            <div style="font-size:10px;color:var(--text-faint);">Premium</div>
+            <div style="font-size:18px;font-weight:600;color:${premCl};margin-top:2px;">${prem>=0?'+':''}${s.premium}%</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);">Top 5: ${s.top5}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:12px;border-top:1px solid var(--glass-border);padding-top:12px;">
+          <div style="text-align:center;">
+            <div style="font-size:10px;color:var(--text-faint);">طلبات</div>
+            <div style="font-size:14px;font-weight:600;margin-top:2px;">${s.netOrders}</div>
+          </div>
+          <div style="text-align:center;border-right:1px solid var(--glass-border);border-left:1px solid var(--glass-border);">
+            <div style="font-size:10px;color:var(--text-faint);">وحدات</div>
+            <div style="font-size:14px;font-weight:600;margin-top:2px;">${s.netUnits}</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:10px;color:var(--text-faint);">مكونات</div>
+            <div style="font-size:14px;font-weight:600;margin-top:2px;">${s.components}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Navigation ──
+function switchScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Actions ──
+async function buyShare() {
+  if (!USER_EMAIL) { showNotif('يرجى تسجيل الدخول أولاً'); return; }
+  if (!confirm('تأكيد شراء حصة بـ $513؟')) return;
+  try {
+    const res  = await fetch(BASE_URL + '?key=' + API_KEY, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'buy', email: USER_EMAIL })
+    });
+    const data = await res.json();
+    if (data.error) { showNotif('خطأ: ' + data.error); return; }
+    showNotif('✓ تمت عملية الشراء بنجاح');
+    await loadData();
+  } catch(e) { showNotif('فشل الاتصال'); }
+}
+
+async function sellShare() {
+  if (!USER_EMAIL) return;
+  if (!confirm('تأكيد عرض حصتك للبيع في السوق الداخلي؟')) return;
+  try {
+    const res  = await fetch(BASE_URL + '?key=' + API_KEY, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'sell', email: USER_EMAIL })
+    });
+    const data = await res.json();
+    if (data.error) { showNotif('خطأ: ' + data.error); return; }
+    showNotif('✓ حصتك معروضة في السوق');
+    await loadData();
+  } catch(e) { showNotif('فشل الاتصال'); }
+}
+
+// ── Notifications ──
+function showNotif(msg) {
+  const bar = document.getElementById('notifBar');
+  document.getElementById('notifText').textContent = msg;
+  bar.classList.add('show');
+  setTimeout(() => bar.classList.remove('show'), 5000);
+}
+function closeNotif() {
+  document.getElementById('notifBar').classList.remove('show');
+}
+
+// ── Init ──
+loadData();
+setInterval(loadData, 3600000);
+</script>
+</body>
+</html>
