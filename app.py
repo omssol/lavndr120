@@ -165,15 +165,6 @@ def notify():
 # ─────────────────────────────────────────────
 # ping من GAS لإبقاء Render مستيقظاً
 # ─────────────────────────────────────────────
-
-@app.route('/firebase-messaging-sw.js')
-def serve_sw():
-    with open('firebase-messaging-sw.js', 'r') as f:
-        content = f.read()
-    response = app.response_class(response=content, mimetype='application/javascript')
-    response.headers['Service-Worker-Allowed'] = '/'
-    return response
-
 @app.route('/')
 def index():
     return jsonify({
