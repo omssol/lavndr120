@@ -169,7 +169,7 @@ def notify():
 import urllib.request
 from flask import jsonify
 
-GAS_DATA_URL = 'https://script.google.com/macros/s/AKfycbzEYTp5ZzQjCr_cRtnO1pn9kE16Lqgnfu26zY4XWQmLcvVLjYoVy1OWrKNGA9eZiM9jYw/exec?key=LAVNDR_SECRET_KEY_2026&action=data'
+GAS_DATA_URL = 'https://script.google.com/macros/s/AKfycbzX2piopY0c3aM--XKCztB_WtIU6rAeaWqhkE6jsv9RRsuShqKZM0nepcCNArhexWoaag/exec?key=LAVNDR_SECRET_KEY_2026&action=data'
 
 @app.route('/data')
 def proxy_data():
