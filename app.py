@@ -165,40 +165,6 @@ def notify():
 # ─────────────────────────────────────────────
 # ping من GAS لإبقاء Render مستيقظاً
 # ─────────────────────────────────────────────
-
-import urllib.request
-from flask import jsonify
-
-GAS_DATA_URL = 'https://script.google.com/macros/s/AKfycbxAl207zzVg1VaEE6sB4Kp2O3ZXuT8JDzgLSSalQFHVI8wjZ46xLb_p_mfMffOpmiVddA/exec?key=LAVNDR_SECRET_KEY_2026&action=data'
-
-@app.route('/data')
-def proxy_data():
-    try:
-        with urllib.request.urlopen(GAS_DATA_URL, timeout=30) as r:
-            data = r.read().decode()
-        response = app.response_class(
-            response=data,
-            mimetype='application/json'
-        )
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/dashboard')
-def dashboard_route():
-    with open('dashboard.html', 'r') as f:
-        return f.read()
-
-@app.route('/firebase-messaging-sw.js')
-def serve_sw():
-    with open('firebase-messaging-sw.js', 'r') as f:
-        content = f.read()
-    response = app.response_class(response=content, mimetype='application/javascript')
-    response.headers['Service-Worker-Allowed'] = '/'
-    return response
-
-
 @app.route('/')
 def index():
     return jsonify({
