@@ -22,18 +22,19 @@ def proxy_data():
 
 @app.route('/dashboard')
 def dashboard_route():
-    return send_from_directory(app.root_path, 'dashboard.html')
+    # Use getcwd() to ensure we are looking at the root of the deployment
+    return send_from_directory(os.getcwd(), 'dashboard.html')
 
 @app.route('/firebase-messaging-sw.js')
 def serve_sw():
-    response = send_from_directory(app.root_path, 'firebase-messaging-sw.js')
+    response = send_from_directory(os.getcwd(), 'firebase-messaging-sw.js')
     response.headers['Service-Worker-Allowed'] = '/'
     return response
 
 @app.route('/debug-files')
 def debug_files():
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
-    return jsonify({'files_in_root': files})
+    return jsonify({'files_in_root': files, 'cwd': os.getcwd()})
 
 @app.route('/')
 def index():
