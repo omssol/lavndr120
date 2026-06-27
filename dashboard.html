@@ -602,10 +602,10 @@ body::before {
 
 <script>
 // ── Config ──
-const BASE_URL = window.location.href.split('?')[0];
+const BASE_URL = 'https://lavndr120.onrender.com';
 const API_KEY  = new URLSearchParams(window.location.search).get('key') || 'LAVNDR_SECRET_KEY_2026';
 const USER_EMAIL = new URLSearchParams(window.location.search).get('email') || '';
-const API_DATA = BASE_URL + '?key=' + API_KEY + '&action=data';
+const API_DATA = 'https://lavndr120.onrender.com/data';
 
 let globalData = null;
 let mainChart  = null;
