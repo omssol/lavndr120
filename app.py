@@ -165,6 +165,19 @@ def notify():
 # ─────────────────────────────────────────────
 # ping من GAS لإبقاء Render مستيقظاً
 # ─────────────────────────────────────────────
+
+@app.route('/debug-files')
+def debug_files():
+    files_in_root = []
+    for root, dirs, files in os.walk(app.root_path):
+        for name in files:
+            files_in_root.append(os.path.join(root, name).replace(app.root_path, ''))
+        for name in dirs:
+            files_in_root.append(os.path.join(root, name).replace(app.root_path, ''))
+        break # Only list files in the immediate root path
+    return jsonify({'files_in_app_root': sorted(files_in_root)})
+
+
 @app.route('/')
 def index():
     return jsonify({
