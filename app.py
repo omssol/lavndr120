@@ -5,7 +5,7 @@ import os, urllib.request
 app = Flask(__name__)
 CORS(app)
 
-GAS_DATA_URL = 'https://script.google.com/macros/s/AKfycbzEYTp5ZzQjCr_cRtnO1pn9kE16Lqgnfu26zY4XWQmLcvVLjYoVy1OWrKNGA9eZiM9jYw/exec?key=LAVNDR_SECRET_KEY_2026&action=data'
+GAS_DATA_URL = 'https://script.google.com/macros/s/AKfycbzKnZE7Pc5QcpJ6NDaENNeJpe-7ZLe6_204kGaWgE5ojeZaaYWtp1sSAqLwHCivwAU-Dw/exec?key=LAVNDR_SECRET_KEY_2026&action=data'
 
 @app.route('/data')
 def proxy_data():
