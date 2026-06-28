@@ -57,7 +57,7 @@ def auth_login():
 def auth_callback():
     code = request.args.get("code")
     if not code:
-        return redirect(GITHUB_APP + "?denied=1")
+        return redirect(GITHUB_APP + "/#denied=1")
     token_res = req.post("https://oauth2.googleapis.com/token", data={
         "code": code,
         "client_id": CLIENT_ID,
@@ -66,27 +66,27 @@ def auth_callback():
         "grant_type": "authorization_code"
     })
     if token_res.status_code != 200:
-        return redirect(GITHUB_APP + "?denied=1")
+        return redirect(GITHUB_APP + "/#denied=1")
     id_token = token_res.json().get("id_token", "")
     user_res = req.get("https://www.googleapis.com/oauth2/v3/tokeninfo",
                        params={"id_token": id_token})
     if user_res.status_code != 200:
-        return redirect(GITHUB_APP + "?denied=1")
+        return redirect(GITHUB_APP + "/#denied=1")
     email = user_res.json().get("email", "").lower()
     if not email:
-        return redirect(GITHUB_APP + "?denied=1")
+        return redirect(GITHUB_APP + "/#denied=1")
     # التحقق من الإيميل محلياً في Render
     ALLOWED = os.environ.get("ALLOWED_EMAILS", "imspractice69@gmail.com")
     allowed_list = [e.strip().lower() for e in ALLOWED.split(",")]
     print(f"Checking email: {email} against {allowed_list}")
     if email not in allowed_list:
         print(f"Email {email} not authorized")
-        return redirect(GITHUB_APP + "?denied=1")
+        return redirect(GITHUB_APP + "/#denied=1")
     print(f"Email {email} authorized")
     clean_sessions()
     token = secrets.token_urlsafe(32)
     sessions[token] = {"email": email, "expires": time.time() + TOKEN_TTL}
-    return redirect(GITHUB_APP + "?token=" + token + "&email=" + email)
+    return redirect(GITHUB_APP + "/#token=" + token + "&email=" + email)
 
 @app.route("/data")
 def data():
