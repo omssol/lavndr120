@@ -76,10 +76,19 @@ def auth_callback():
     if not email:
         return redirect(GITHUB_APP + "?denied=1")
     try:
-        gas_res = req.get(GAS_URL, params={"key": GAS_KEY, "action": "checkauth", "email": email}, timeout=15)
-        if not gas_res.json().get("authorized"):
+        gas_res = req.get(GAS_URL, params={"key": GAS_KEY, "action": "checkauth", "email": email}, timeout=30)
+        print(f"GAS checkauth status: {gas_res.status_code}")
+        print(f"GAS checkauth response: {gas_res.text[:200]}")
+        gas_text = gas_res.text.strip()
+        if not gas_text or gas_text.startswith("<"):
+            print("GAS returned HTML — retrying")
             return redirect(GITHUB_APP + "?denied=1")
-    except:
+        gas_data = gas_res.json()
+        print(f"GAS authorized: {gas_data.get('authorized')}")
+        if not gas_data.get("authorized"):
+            return redirect(GITHUB_APP + "?denied=1")
+    except Exception as ex:
+        print(f"GAS checkauth error: {ex}")
         return redirect(GITHUB_APP + "?denied=1")
     clean_sessions()
     token = secrets.token_urlsafe(32)
