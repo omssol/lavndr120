@@ -53,11 +53,16 @@ def auth_login():
     )
     return redirect(url)
 
+used_codes = set()
+
 @app.route("/auth/callback")
 def auth_callback():
     code = request.args.get("code")
     if not code:
         return redirect(GITHUB_APP + "/#denied=1")
+    if code in used_codes:
+        return redirect(GITHUB_APP + "/#denied=1")
+    used_codes.add(code)
     token_res = req.post("https://oauth2.googleapis.com/token", data={
         "code": code,
         "client_id": CLIENT_ID,
