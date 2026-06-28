@@ -175,9 +175,31 @@ def auth_firebase():
 @app.route("/api/data")
 def api_data():
     token = request.headers.get("X-Auth-Token") or request.args.get("token")
-    email = verify_token(token)
-    if not email:
-        return jsonify({"error": "Unauthorized", "code": 401}), 401
+    email = request.headers.get("X-User-Email", "").lower()
+    # تحقق من Google JWT مباشرة
+    if token and email:
+        try:
+            import base64 as b64
+            parts = token.split('.')
+            if len(parts) >= 2:
+                payload_str = parts[1] + '=' * (4 - len(parts[1]) % 4)
+                payload = json.loads(b64.b64decode(payload_str).decode())
+                token_email = payload.get("email", "").lower()
+                ALLOWED = os.environ.get("ALLOWED_EMAILS", "imspractice69@gmail.com")
+                allowed_list = [e.strip().lower() for e in ALLOWED.split(",")]
+                if token_email in allowed_list and token_email == email:
+                    email = token_email
+                else:
+                    return jsonify({"error": "Unauthorized", "code": 401}), 401
+            else:
+                return jsonify({"error": "Unauthorized", "code": 401}), 401
+        except:
+            return jsonify({"error": "Unauthorized", "code": 401}), 401
+    else:
+        session_email = verify_token(token)
+        if not session_email:
+            return jsonify({"error": "Unauthorized", "code": 401}), 401
+        email = session_email
     try:
         gas_res = req.get(GAS_URL, params={
             "key": GAS_KEY, "action": "data"
