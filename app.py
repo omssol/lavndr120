@@ -163,6 +163,35 @@ def auth_firebase():
         print(f"Firebase auth error: {e}")
         return jsonify({"error": str(e)}), 401
 
+
+@app.route("/api/data")
+def api_data():
+    token = request.headers.get("X-Auth-Token") or request.args.get("token")
+    email = verify_token(token)
+    if not email:
+        return jsonify({"error": "Unauthorized", "code": 401}), 401
+    try:
+        gas_res = req.get(GAS_URL, params={
+            "key": GAS_KEY, "action": "data"
+        }, timeout=30)
+        return jsonify(gas_res.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/participant")
+def api_participant():
+    token = request.headers.get("X-Auth-Token") or request.args.get("token")
+    email = verify_token(token)
+    if not email:
+        return jsonify({"error": "Unauthorized", "code": 401}), 401
+    try:
+        gas_res = req.get(GAS_URL, params={
+            "key": GAS_KEY, "action": "participant", "email": email
+        }, timeout=30)
+        return jsonify(gas_res.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/ping")
 def ping():
     return jsonify({"pong": True, "sessions": len(sessions)})
