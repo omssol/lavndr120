@@ -113,6 +113,20 @@ def register():
         participant_tokens[email] = fcm
     return jsonify({"status": "registered"})
 
+
+@app.route("/debug/checkauth")
+def debug_checkauth():
+    email = request.args.get("email", "imspractice69@gmail.com")
+    try:
+        gas_res = req.get(GAS_URL, params={"key": GAS_KEY, "action": "checkauth", "email": email}, timeout=15)
+        return jsonify({
+            "gas_url": GAS_URL,
+            "gas_status": gas_res.status_code,
+            "gas_response": gas_res.json()
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
 @app.route("/ping")
 def ping():
     return jsonify({"pong": True, "sessions": len(sessions)})
