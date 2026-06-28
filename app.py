@@ -134,6 +134,35 @@ def debug_checkauth():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+
+@app.route("/auth/firebase", methods=["POST"])
+def auth_firebase():
+    """التحقق من Firebase ID token وإصدار session token"""
+    data = request.json or {}
+    id_token = data.get("id_token")
+    if not id_token:
+        return jsonify({"error": "id_token required"}), 400
+    try:
+        # تحقق من Firebase token
+        from firebase_admin import auth as fb_auth
+        decoded = fb_auth.verify_id_token(id_token)
+        email = decoded.get("email", "").lower()
+        if not email:
+            return jsonify({"error": "No email in token"}), 401
+        # تحقق من القائمة المصرح بها
+        ALLOWED = os.environ.get("ALLOWED_EMAILS", "imspractice69@gmail.com")
+        allowed_list = [e.strip().lower() for e in ALLOWED.split(",")]
+        if email not in allowed_list:
+            return jsonify({"error": "Unauthorized", "code": 401}), 401
+        # إصدار session token
+        clean_sessions()
+        token = secrets.token_urlsafe(32)
+        sessions[token] = {"email": email, "expires": time.time() + TOKEN_TTL}
+        return jsonify({"token": token, "email": email})
+    except Exception as e:
+        print(f"Firebase auth error: {e}")
+        return jsonify({"error": str(e)}), 401
+
 @app.route("/ping")
 def ping():
     return jsonify({"pong": True, "sessions": len(sessions)})
