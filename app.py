@@ -225,16 +225,25 @@ def api_participant():
 
 @app.route("/proxy/data")
 def proxy_data():
-    """Proxy لـ GAS بدون مصادقة — المصادقة تتم في المتصفح"""
-    try:
-        gas_res = req.get(GAS_URL, params={
-            "key": GAS_KEY, "action": "data"
-        }, timeout=30)
-        response = jsonify(gas_res.json())
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    """Proxy لـ GAS مع retry"""
+    for attempt in range(3):
+        try:
+            gas_res = req.get(GAS_URL, params={
+                "key": GAS_KEY, "action": "data"
+            }, timeout=30, allow_redirects=True)
+            text = gas_res.text.strip()
+            if text.startswith('<'):
+                print(f"GAS returned HTML on attempt {attempt+1}")
+                time.sleep(2)
+                continue
+            data = gas_res.json()
+            response = jsonify(data)
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+        except Exception as e:
+            print(f"Attempt {attempt+1} failed: {e}")
+            time.sleep(2)
+    return jsonify({"error": "GAS unavailable"}), 503
 
 @app.route("/ping")
 def ping():
