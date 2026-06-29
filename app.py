@@ -222,6 +222,20 @@ def api_participant():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@app.route("/proxy/data")
+def proxy_data():
+    """Proxy لـ GAS بدون مصادقة — المصادقة تتم في المتصفح"""
+    try:
+        gas_res = req.get(GAS_URL, params={
+            "key": GAS_KEY, "action": "data"
+        }, timeout=30)
+        response = jsonify(gas_res.json())
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/ping")
 def ping():
     return jsonify({"pong": True, "sessions": len(sessions)})
